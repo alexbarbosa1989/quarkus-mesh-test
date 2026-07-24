@@ -79,3 +79,12 @@ oc get pods -n quarkus-mesh-test
 oc get pod -n quarkus-mesh-test -l app=quarkus-mesh-test -o jsonpath='{.items[0].spec.containers[*].name}'
 ```
 
+## Test the app
+Expose the svc:
+```bash
+oc expose svc quarkus-mesh-test
+```
+CURL exposed enpoint:
+```bash
+curl http://quarkus-mesh-test-quarkus-mesh-test.apps.<ocp.domain.com>/hello
+```
