@@ -11,53 +11,7 @@ Red Hat OpenShift Service Mesh 2.6.
   the Envoy sidecar
 - `GET /q/health/live` and `/q/health/ready` - probes
 
-## Build (local, JVM mode)
-
-```bash
-mvn clean package
-docker build -f src/main/docker/Dockerfile.jvm -t quarkus-mesh-test:latest .
-```
-
-## Build directly on OpenShift — three options
-
-### Option A: Docker strategy, binary input (uses Dockerfile.jvm)
-
-```bash
-oc new-project quarkus-mesh-test
-oc delete bc,is,build -l build=quarkus-mesh-test --ignore-not-found   # clean slate
-oc new-build --name=quarkus-mesh-test --binary --strategy=docker -l app=quarkus-mesh-test
-mvn clean package
-oc start-build quarkus-mesh-test --from-dir=. --follow
-```
-`--strategy=docker` is required — without it `oc new-build --binary` has no
-way to know it should use the Dockerfile. By default it looks for a file
-named `Dockerfile` at the repo root; since ours lives at
-`src/main/docker/Dockerfile.jvm`, either copy/symlink it to the root as
-`Dockerfile`, or patch the BuildConfig's `spec.strategy.dockerStrategy.dockerfilePath`
-to point at it.
-
-### Option B: S2I strategy, binary input (uses the UBI OpenJDK builder image, no Dockerfile)
-
-```bash
-oc new-project quarkus-mesh-test
-oc delete bc,is,build -l build=quarkus-mesh-test --ignore-not-found   # clean slate
-oc new-build registry.access.redhat.com/ubi9/openjdk-17:1.20 --binary --name=quarkus-mesh-test
-mvn clean package
-oc start-build quarkus-mesh-test --from-dir=target/quarkus-app --follow
-```
-Only `target/quarkus-app` gets uploaded here — the builder image's own
-assemble script handles the runtime layout, so it doesn't need your `pom.xml`
-or Dockerfile.
-
-If either option fails with `InvalidOutputReference: Output image could not
-be resolved`, check whether the cluster's internal image registry is actually
-running (`oc get pods -n openshift-image-registry` and
-`oc get configs.imageregistry.operator.openshift.io cluster -o jsonpath='{.spec.managementState}'`).
-If it's `Removed`/not deployed, build locally with podman/docker and push to
-an external registry (quay.io, etc.) instead, then point `k8s/03-app.yaml`'s
-`image:` at that external reference.
-
-### Option C: S2I strategy, Git source (uses `oc new-app`, matches the `image~git-url` pattern)
+### Build S2I strategy, Git source (uses `oc new-app`, matches the `image~git-url` pattern)
 
 This is the source workflow — OpenShift pulls straight from your Git repo and
 sets up an image-change trigger, so future pushes can auto-rebuild/redeploy.
@@ -70,14 +24,9 @@ the app across `lib/`, `app/`, `quarkus/`, and `quarkus-run.jar`.
 ```bash
 # push this project to your own GitHub repo first, then:
 oc new-project quarkus-mesh-test
-oc new-app registry.redhat.io/ubi8/openjdk-17:latest~https://github.com/<you>/quarkus-mesh-test.git --name=quarkus-mesh-test
+oc new-app registry.redhat.io/ubi8/openjdk-17:latest~https://github.com/alexbarbosa1989/quarkus-mesh-test.git --name=quarkus-mesh-test
 oc logs -f bc/quarkus-mesh-test
 ```
-`oc new-app` (unlike `oc new-build`) also creates the Service and a
-Deployment automatically — you likely won't need `k8s/03-app.yaml`'s
-Deployment/Service, just add the `sidecar.istio.io/inject` annotation to the
-pod template it creates, and still apply the Route/mesh manifests
-separately.
 
 ## Deploy
 
