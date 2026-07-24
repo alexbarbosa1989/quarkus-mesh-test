@@ -58,7 +58,7 @@ for leftover CRs before enrolling:
 oc get istio,istiocni -A
 ```
 
-## [Known issie ossm 2.6] Clean kiali dependency
+## [Known issue ossm 2.6] Clean kiali dependency
 ```bash
 oc patch smcp basic -n istio-system --type merge -p '{"spec":{"addons":{"kiali":{"enabled":false}}}}'
 oc get smcp basic -n istio-system -o jsonpath='{.status.conditions}'
