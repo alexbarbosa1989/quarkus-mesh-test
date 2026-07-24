@@ -13,6 +13,6 @@ spec:
     grafana:
       enabled: false
     kiali:
-      enabled: true
+      enabled: false
     prometheus:
-      enabled: true
+      enabled: false
