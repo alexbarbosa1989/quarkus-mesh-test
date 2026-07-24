@@ -32,13 +32,6 @@ oc logs -f bc/quarkus-mesh-test
 
 ## Deploy
 
-Manifests are in `k8s/`, applied in order:
-
-```bash
-oc apply -f k8s/01-smcp.yaml  # ServiceMeshControlPlane (istio-system)
-oc apply -f k8s/02-smm.yaml   # enrolls quarkus-mesh-test into the mesh
-```
-
 Before applying `01-smcp.yaml`, confirm your operator subscription actually
 resolved to a 2.6.x CSV:
 
@@ -46,12 +39,36 @@ resolved to a 2.6.x CSV:
 oc get csv -n openshift-operators | grep servicemesh
 ```
 
+Manifests are in `k8s/`, applied in order:
+
+```bash
+oc apply -f k8s/01-smcp.yaml  # ServiceMeshControlPlane (istio-system)
+oc apply -f k8s/02-smm.yaml   # enrolls quarkus-mesh-test into the mesh
+```
+
+Patch the quarkus deployment to reference the sidecar inject:
+```bash
+oc patch deployment quarkus-mesh-test -n quarkus-mesh-test --type merge -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"true"}}}}}'
+oc get deployment quarkus-mesh-test -n quarkus-mesh-test -o jsonpath='{.spec.template.metadata.annotations}'
+```
+
 If this cluster/namespace ever ran OSSM 3 (Sail Operator) previously, check
 for leftover CRs before enrolling:
-
 ```bash
 oc get istio,istiocni -A
 ```
+
+## [Known issie ossm 2.6] Clean kiali dependency
+```bash
+oc patch smcp basic -n istio-system --type merge -p '{"spec":{"addons":{"kiali":{"enabled":false}}}}'
+oc get smcp basic -n istio-system -o jsonpath='{.status.conditions}'
+```
+Restart quarkus pod
+```bash
+oc rollout restart deployment/quarkus-mesh-test -n quarkus-mesh-test
+```
+
+
 
 ## Verifying the sidecar actually injected
 
