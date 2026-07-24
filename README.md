@@ -61,11 +61,3 @@ oc get pods -n quarkus-mesh-test
 oc get pod -n quarkus-mesh-test -l app=quarkus-mesh-test -o jsonpath='{.items[0].spec.containers[*].name}'
 ```
 
-## Notes
-
-- `image` in `03-app.yaml` points at the internal registry path produced by
-  an `oc new-build`/`BuildConfig` flow. Adjust if you're pushing to an
-  external registry instead.
-- This is deliberately bare-bones (no auth, no TLS termination config) - the
-  point is to exercise SMCP reconciliation and sidecar injection on 2.6, not
-  to be a production workload.
