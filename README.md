@@ -3,6 +3,8 @@
 Minimal Quarkus app for testing sidecar injection / mTLS behavior against
 Red Hat OpenShift Service Mesh 2.6.
 
+## Important: OCP cluster has already installed OSSM 2.6
+
 ## Endpoints
 
 - `GET /hello` - plain text sanity check
@@ -11,7 +13,7 @@ Red Hat OpenShift Service Mesh 2.6.
   the Envoy sidecar
 - `GET /q/health/live` and `/q/health/ready` - probes
 
-### Build S2I strategy, Git source (uses `oc new-app`, matches the `image~git-url` pattern)
+## Build S2I strategy, Git source (uses `oc new-app`, matches the `image~git-url` pattern)
 
 This is the source workflow — OpenShift pulls straight from your Git repo and
 sets up an image-change trigger, so future pushes can auto-rebuild/redeploy.
