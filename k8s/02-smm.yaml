@@ -1,0 +1,13 @@
+# Enrolls the quarkus-mesh-test namespace into the "basic" control plane.
+# On older 2.6.x point releases you may need a ServiceMeshMemberRoll in
+# istio-system instead - check which CRD your operator version installed:
+#   oc get crd | grep maistra.io
+apiVersion: maistra.io/v1
+kind: ServiceMeshMember
+metadata:
+  name: default
+  namespace: quarkus-mesh-test
+spec:
+  controlPlaneRef:
+    namespace: istio-system
+    name: basic

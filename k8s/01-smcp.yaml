@@ -1,0 +1,18 @@
+# Requires the OSSM operator subscribed on the 2.6.x channel.
+# Verify with: oc get packagemanifest servicemeshoperator -n openshift-marketplace -o yaml
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: basic
+  namespace: istio-system
+spec:
+  version: v2.6
+  tracing:
+    type: None
+  addons:
+    grafana:
+      enabled: false
+    kiali:
+      enabled: true
+    prometheus:
+      enabled: true
