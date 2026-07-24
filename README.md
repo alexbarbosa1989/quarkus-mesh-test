@@ -35,7 +35,6 @@ oc logs -f bc/quarkus-mesh-test
 Manifests are in `k8s/`, applied in order:
 
 ```bash
-oc apply -f k8s/03-app.yaml   # namespace + deployment + service + route
 oc apply -f k8s/01-smcp.yaml  # ServiceMeshControlPlane (istio-system)
 oc apply -f k8s/02-smm.yaml   # enrolls quarkus-mesh-test into the mesh
 ```
