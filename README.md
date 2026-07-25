@@ -24,7 +24,6 @@ under `target/` and won't find a runnable entry point, since fast-jar splits
 the app across `lib/`, `app/`, `quarkus/`, and `quarkus-run.jar`.
 
 ```bash
-# push this project to your own GitHub repo first, then:
 oc new-project quarkus-mesh-test
 oc new-app registry.redhat.io/ubi8/openjdk-17:latest~https://github.com/alexbarbosa1989/quarkus-mesh-test.git --name=quarkus-mesh-test
 oc logs -f bc/quarkus-mesh-test
